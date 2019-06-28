@@ -3,3 +3,10 @@
 ################################################################################
 
 /.vs
+/ARDemo.Core/bin/Debug/netstandard2.0
+/ARDemo.Core/obj
+/ARDemo.Droid/bin/Debug
+/ARDemo.Droid/obj
+/ARDemo.iOS/bin
+/ARDemo.iOS/obj
+/packages

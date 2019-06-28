@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+  <style name="AppTheme" parent="AppTheme.Base">
+  </style>
+
+  <style name="AppTheme.Base" parent="Theme.AppCompat.Light.NoActionBar">
+
+    <item name="colorPrimary">@color/primary</item>
+
+    <item name="colorPrimaryDark">@color/primaryDark</item>
+
+    <item name="colorAccent">@color/accent</item>
+
+    <item name="android:windowBackground">@color/window_background</item>
+
+    <item name="android:navigationBarColor">@color/primary</item>
+
+    <item name="colorControlActivated">@color/accent</item>
+
+    <item name="colorControlHighlight">@color/accent</item>
+
+    <item name="colorSwitchThumbNormal">@color/accent</item>
+    
+    <item name="android:colorPressedHighlight">@color/primaryDark</item>
+
+    <item name="android:colorLongPressedHighlight">@color/primaryDark</item>
+
+    <item name="android:colorFocusedHighlight">@color/primaryDark</item>
+
+    <item name="android:colorActivatedHighlight">@android:color/transparent</item>
+
+    <item name="android:activatedBackgroundIndicator">@color/primaryDark</item>
+
+
+  </style>
+</resources>

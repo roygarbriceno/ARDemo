@@ -1,0 +1,141 @@
+﻿using Xamarin.Forms;
+using Xamarin.Forms.Platform.iOS;
+using SceneKit;
+using UIKit;
+using ARKit;
+using CoreGraphics;
+using Foundation;
+using OpenTK;
+using System.Linq;
+using System;
+using ARDemo.iOS.Delegates;
+using ARDemo.iOS.Pages;
+using ARDemo.iOS.Renderers;
+// ReSharper disable All
+
+[assembly: ExportRenderer(typeof(ARPage), typeof(ARPageRenderer))]
+namespace ARDemo.iOS.Renderers
+{
+    //Page Renderer to display AR Screen View from Forms Code, implementing AR ScreenView Delegate
+    public class ARPageRenderer : PageRenderer, IARSCNViewDelegate
+    {
+        private ARSCNView scnView;
+
+        public ARPageRenderer() 
+        {
+            this.scnView = new ARSCNView();
+         
+        }
+
+        public override bool ShouldAutorotate() => true;
+
+
+        public override void ViewWillAppear(bool animated)
+        {
+            base.ViewWillAppear(animated);
+            this.View.AddSubview(this.scnView);
+        }
+
+    
+     
+        public override void ViewDidLoad()
+        {
+            base.ViewDidLoad();           
+            this.scnView.Frame = this.View.Frame;
+        }
+
+        public override void ViewDidAppear(bool animated)
+        {
+            base.ViewDidAppear(animated);
+
+            this.scnView.Session.Run(new ARWorldTrackingConfiguration
+                {
+                    AutoFocusEnabled = true,
+                    PlaneDetection = ARPlaneDetection.Horizontal,
+                    LightEstimationEnabled = true,
+                    WorldAlignment = ARWorldAlignment.GravityAndHeading
+                }, ARSessionRunOptions.ResetTracking | ARSessionRunOptions.RemoveExistingAnchors);
+
+        }
+
+
+        public override void ViewDidDisappear(bool animated)
+        {
+            base.ViewDidDisappear(animated);
+            this.scnView.Session.Pause();
+        }
+
+       
+     
+        public override void TouchesBegan(NSSet touches, UIEvent evt)
+        {
+            base.TouchesBegan(touches, evt);
+            var touch = touches.AnyObject as UITouch;
+            if (touch != null)
+            {
+                var loc = touch.LocationInView(scnView);
+                var worldPos = WorldPositionFromHitTest(loc);
+
+                //if corresponds to some world position
+                if (worldPos.Item1.HasValue)
+                {
+                    //Add cube on AR Screen View
+                    PlaceCube(worldPos.Item1.Value);
+                }
+            }
+        }
+
+        private SCNVector3 PositionFromTransform(NMatrix4 xform)
+        {
+            return new SCNVector3(xform.M14, xform.M24, xform.M34);
+        }
+
+
+        //Getting world position from touch hit
+        Tuple<SCNVector3?, ARAnchor> WorldPositionFromHitTest(CGPoint pt)
+        {
+            //Hit test against existing anchors
+            var hits = scnView.HitTest(pt, ARHitTestResultType.ExistingPlaneUsingExtent);
+            if (hits != null && hits.Length > 0)
+            {
+                var anchors = hits.Where(r => r.Anchor is ARPlaneAnchor);
+                if (anchors.Count() > 0)
+                {
+                    var first = anchors.First();
+                    var pos = PositionFromTransform(first.WorldTransform);
+                    return new Tuple<SCNVector3?, ARAnchor>(pos, (ARPlaneAnchor)first.Anchor);
+                }
+            }
+            return new Tuple<SCNVector3?, ARAnchor>(null, null);
+        }
+
+
+        //To load assets  
+        private SCNMaterial[] LoadMaterials()
+        {
+            Func<string, SCNMaterial> LoadMaterial = fname =>
+            {
+                var mat = new SCNMaterial();
+                mat.Diffuse.Contents = UIImage.FromFile(fname);
+                mat.LocksAmbientWithDiffuse = true;
+                return mat;
+            };
+
+            var a = LoadMaterial("msft_logo.png");
+            var b = LoadMaterial("xamagon.png");
+            var c = LoadMaterial("fsharp.png"); // This demo was originally in F# :-) 
+
+            return new[] { a, b, a, b, c, c };
+        }
+
+
+        SCNNode PlaceCube(SCNVector3 pos)
+        {
+            var box = new SCNBox { Width = 0.25f, Height = 0.25f, Length = 0.25f };
+            var cubeNode = new SCNNode { Position = pos, Geometry = box };
+            cubeNode.Geometry.Materials = LoadMaterials();
+            scnView.Scene.RootNode.AddChildNode(cubeNode);
+            return cubeNode;
+        }
+    }
+}

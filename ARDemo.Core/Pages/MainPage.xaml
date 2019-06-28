@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<views:MvxContentPage x:TypeArguments="viewModels:MainViewModel"
+                      xmlns="http://xamarin.com/schemas/2014/forms"
+                      xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                      xmlns:views="clr-namespace:MvvmCross.Forms.Views;assembly=MvvmCross.Forms"
+                      xmlns:mvx="clr-namespace:MvvmCross.Forms.Bindings;assembly=MvvmCross.Forms"
+                      xmlns:viewModels="clr-namespace:ARDemo.Core.ViewModels;assembly=ARDemo.Core"
+                      x:Class="ARDemo.Core.Pages.MainPage" Title="Main">
+
+    <StackLayout Margin="0,32,0,0" HorizontalOptions="Center" Spacing="0">
+        <Button Text="Show AR" Command="{Binding ShowArViewCommand}" />
+    </StackLayout>
+    
+</views:MvxContentPage>
